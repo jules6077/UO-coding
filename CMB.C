@@ -47,6 +47,7 @@ void CMB(){
   vector<double> col5;
   
   int rowNum = v.size();
+  double pi = TMath::Pi();
   double col1ar[rowNum], col2ar[rowNum], col4ar[rowNum], omega_data[rowNum], u_w_data[rowNum];
 
 //Now I will define my important constants:
@@ -79,8 +80,7 @@ void CMB(){
 	 TF1 *fitFcn = new TF1("fitFcn",fitFunc,300e9,4.1e12,1);
    	 fitFcn->SetNpx(500);
    	 fitFcn->SetLineWidth(3);
-   	 fitFcn->SetLineColor(kRed);
- 
+   	 fitFcn->SetLineColor(kRed); 
 
 	TCanvas *can = new TCanvas("c","Black Body Spectrum Fitted Plot");
 	can->SetGrid();
@@ -132,15 +132,40 @@ void CMB(){
   residual->SetMarkerSize(3);
   residual->Draw("ap");
   residual->SetTitle("Black Body Spectrum;#omega; Residuals");
-	//can2->Draw("ap");
+
+//Fit params:
+        double par[1];
+        fitFcn->GetParameters(par);
 
 //LEGEND:
-	TLegend *legend = new TLegend(0.9,0.8,0.8,0.9);
-	//legend->SetHeader("Legend","C");
+	TLegend *legend = new TLegend(0.9,0.78,0.64,0.9);
+	legend->SetHeader(Form("Fitted T: %f K", par[0]),"C");
 	legend->AddEntry(g,"Data","l");
 	legend->AddEntry(fitFcn,"Predicted","l");
+	legend->SetTextSize(.04);
 	legend->Draw();
+
+//SAVE:
+	can->SaveAs("CMB.png");
+
+//Part ii
+
+	//Number Density: 
+	double beta = 1/(k_B*2.7);
+	double N_V = 2 * (1.202) / (pow(pi,2) * pow(c,3) * pow((beta*hbar),3));
+	cout << "Number Density: " << N_V << " [1/m^3]" <<endl;	
+
+	//Entropy Density: 
+	double zeta_4 = pow(pi,4)/90;
+	double S_V = (8 * pow(k_B,4) * pow(2.7,3) * zeta_4 / (pow(pi,2) * pow(c,3) * pow(hbar,3)));
+	cout << "Entropy Density: " << S_V << " [J/K m^3]" << endl;
+
+	//Energy Density: 
+	double E_V = pow(pi, 2)*pow(k_B*par[0], 4)/(15 * pow(hbar*c, 3));
+	cout << "Energy Density: " << E_V << " [J/m^3]" << endl;
+	
+	
 
   //return 0;
 }
-
+	
